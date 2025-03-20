@@ -196,7 +196,7 @@ void absVector(float *values, float *output, int N) {
   for (int i = 0; i < N; i += VECTOR_WIDTH) {
 
     // All ones
-    maskAll = _cs149_init_ones();
+    maskAll = _cs149_init_ones(N - i);
 
     // All zeros
     maskIsNegative = _cs149_init_ones(0);
@@ -256,6 +256,65 @@ void clampedExpVector(float *values, int *exponents, float *output, int N) {
   // Your solution should work for any value of
   // N and VECTOR_WIDTH, not just when VECTOR_WIDTH divides N
   //
+
+  float limit = 9.999999f;
+  __cs149_vec_float x;
+  __cs149_vec_int y;
+  __cs149_vec_int count;
+  __cs149_vec_float result;
+  __cs149_vec_int zero = _cs149_vset_int(0);
+  __cs149_vec_int one = _cs149_vset_int(1);
+  __cs149_vec_float clamp = _cs149_vset_float(limit);
+  __cs149_mask maskAll, maskIsZero, maskIsPositive, maskClamp;
+
+  for (int i = 0; i < N; i += VECTOR_WIDTH) {
+    maskAll = _cs149_init_ones(N - i);
+
+    // `float x = values[i];`
+    _cs149_vload_float(x, values + i, maskAll);
+
+    // `int y = exponents[i];`
+    _cs149_vload_int(y, exponents + i, maskAll);
+
+    // `if (y == 0)`
+    _cs149_veq_int(maskIsZero, y, zero, maskAll);
+    {
+      // `result = 1.f;`
+      _cs149_vset_float(result, 1.f, maskIsZero);
+    }
+
+    // `else`
+    maskIsPositive = _cs149_mask_not(maskIsZero);
+    {
+      // `float result = x;`
+      _cs149_vmove_float(result, x, maskIsPositive);
+
+      // `int count = y - 1;`
+      _cs149_vsub_int(count, y, one, maskIsPositive);
+
+      // `while (count > 0)`
+      _cs149_vgt_int(maskIsPositive, count, zero, maskIsPositive);
+      while (_cs149_cntbits(maskIsPositive) > 0) {
+        // `result *= x;`
+        _cs149_vmult_float(result, result, x, maskIsPositive);
+
+        // `count--;`
+        _cs149_vsub_int(count, count, one, maskIsPositive);
+
+        _cs149_vgt_int(maskIsPositive, count, zero, maskIsPositive);
+      }
+
+      // `if (result > 9.999999f)`
+      _cs149_vgt_float(maskClamp, result, clamp, maskAll);
+      {
+        // `result = 9.999999f;`
+        _cs149_vset_float(result, limit, maskClamp);
+      }
+    }
+
+    // `output[i] = result;`
+    _cs149_vstore_float(output + i, result, maskAll);
+  }
 }
 
 // returns the sum of all elements in values
