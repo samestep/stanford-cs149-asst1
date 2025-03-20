@@ -15,8 +15,8 @@ using namespace std;
 
 // Main compute functions
 extern void kMeansThread(double *data, double *clusterCentroids,
-                      int *clusterAssignments, int M, int N, int K,
-                      double epsilon);
+                         int *clusterAssignments, int M, int N, int K,
+                         double epsilon);
 extern double dist(double *x, double *y, int nDim);
 
 // Utilities
@@ -127,8 +127,8 @@ int main() {
   //           &K, &epsilon);
   */
 
-  printf("Running K-means with: M=%d, N=%d, K=%d, epsilon=%f\n", M, N,
-         K, epsilon);
+  printf("Running K-means with: M=%d, N=%d, K=%d, epsilon=%f\n", M, N, K,
+         epsilon);
 
   // Log the starting state of the algorithm
   logToFile("./start.log", SAMPLE_RATE, data, clusterAssignments,
