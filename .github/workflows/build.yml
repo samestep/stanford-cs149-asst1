@@ -6,4 +6,4 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - run: git ls-files '*.cpp' '*.h' | xargs clang-format --dry-run -Werror
+      - run: git ls-files '*.cpp' '*.h' '*.ispc' | xargs clang-format --dry-run -Werror
